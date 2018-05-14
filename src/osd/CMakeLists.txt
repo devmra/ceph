@@ -32,6 +32,10 @@ set(osd_srcs
   mClockOpClassQueue.cc
   mClockClientQueue.cc
   PGQueueable.cc
+  Deduper.cc
+  DedupLogger.cc
+  DedupOp.cc
+  time_stats.c
   ${CMAKE_SOURCE_DIR}/src/common/TrackedOp.cc
   ${osd_cyg_functions_src}
   ${osdc_osd_srcs})
