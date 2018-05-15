@@ -474,8 +474,10 @@ bool DedupOpRead::is_done() {
 
 void DedupOpRead::queue_back()
 {
-    Mutex::Locker l(pg->queue_lock);
-    pg->queue_op(op);
+	// mra: need to check if this is ok. 
+    //Mutex::Locker l(pg->queue_lock);
+    //pg->queue_op(op);
+	dlog("! disabled by MRA. need to recheck.");
 }
 
 /*************************************************

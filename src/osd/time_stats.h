@@ -58,7 +58,7 @@ typedef struct time_stats time_stats_t;
  */
 
 void time_stats_init       (time_stats_t* ts);
-void time_stats_init_named (time_stats_t* ts, char* name);
+void time_stats_init_named (time_stats_t* ts, const char* name);
 void time_stats_destroy    (time_stats_t* ts);
 void time_stats_enable_tail_latencies (time_stats_t* ts);
 //The name will be used for pretty outputting later, eg:

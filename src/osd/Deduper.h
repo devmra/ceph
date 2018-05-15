@@ -1,8 +1,11 @@
+#ifndef __CEPH_DEDUPER_H__
+#define __CEPH_DEDUPER_H__
+
 //#include <rados/librados.hpp>
 #include "common/Mutex.h"
 #include "include/rados/librados.hpp"
 #include "osd/DedupOp.h"
-#include "osd/OSD.h"
+//#include "osd/OSD.h"
 #include "DedupLogger.h"
 #include "time_stats.h"
 #include <list>
@@ -15,7 +18,6 @@
 #include <chrono>
 
 #define PRINT_STATS 1
-
 
 
 class Deduper
@@ -113,3 +115,7 @@ public:
     Trigger* trigger;
 
 };
+
+
+#endif
+

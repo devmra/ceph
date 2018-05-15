@@ -1,10 +1,10 @@
-#include "Deduper.h"
+#include <chrono>
 #include <regex>
-#include "DedupLogger.h"
-#include "PG.h"
 #include <unistd.h>
 #include "common/Clock.h"
-#include <chrono>
+#include "Deduper.h"
+#include "PG.h"
+#include "OSD.h"
 
 #define POST_PROCESS_TIME_MS 0
 #define SKIP_DEDUP_WRITE 0
@@ -116,9 +116,10 @@ bool Deduper::filter_op (PGRef pg, OpRequestRef& op)
         //return 0;
     #endif
 
-
-    Message* msg = op->get_req();
-    MOSDOp *m = static_cast<MOSDOp*>(op->get_req());
+    //Message* msg = op->get_req();
+    //MOSDOp *m = static_cast<MOSDOp*>(op->get_req());
+    const Message* msg = op->get_req();
+	MOSDOp *m = static_cast<MOSDOp*>(op->get_nonconst_req());
 
     //not a regular op, return false
     if (m->get_type() != CEPH_MSG_OSD_OP)
@@ -142,14 +143,15 @@ bool Deduper::filter_op (PGRef pg, OpRequestRef& op)
     }
 
     #if PRINT_STATS
-        utime_t elaps = ceph_clock_now(pg->get_cct());
+        //utime_t elaps = ceph_clock_now(pg->get_cct());
+        utime_t elaps = ceph_clock_now();
         elaps -= msg->get_recv_stamp();
         dlog("\n\n***** ELAPS: %.6f s\n", elaps.to_nsec()/1000000000.0);
         time_stats_stop_dummy(&Deduper::get_instance().ceph_oh, elaps.to_nsec()/1000000000.0);
         time_stats_start(&Deduper::get_instance().filter_oh);
     #endif
     
-    bool off = match.str(3) == "off" ? true : false;
+    //bool off = match.str(3) == "off" ? true : false;
     uint32_t chunk_sz = std::stoul(match.str(2));
 
     DedupOpBase* dop;
@@ -242,7 +244,7 @@ void* Deduper::run(void* arg)
     dlog(">>> Dedup Thread Running\n");
     Deduper& me = Deduper::get_instance();
     
-    while(1) {
+    while (1) {
         //check waiting ops and issue the ones that are ready
         DedupOpBase* op = 0;
         DedupOpBase** op2 = 0;

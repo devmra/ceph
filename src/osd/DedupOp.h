@@ -1,5 +1,5 @@
-#ifndef __DEDUPOP_H__
-#define __DEDUPOP_H__
+#ifndef __DEDUP_OP_H__
+#define __DEDUP_OP_H__
 
 #include <list>
 #include <chrono>
@@ -8,7 +8,7 @@
 #include "include/rados/librados.hpp"
 #include "osd/OpRequest.h"
 #include "osd/osd_types.h"
-#include "types.h"
+//#include "types.h"
 #include "PG.h"
 //hash
 

@@ -20,7 +20,7 @@ void time_stats_init (time_stats_t *ts)
     memset (&ts->last_start, 0, sizeof (struct timeval));
 }
 
-void time_stats_init_named (time_stats_t* ts, char* name)
+void time_stats_init_named (time_stats_t* ts, const char* name)
 {
     time_stats_init (ts);
 
