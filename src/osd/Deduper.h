@@ -1,24 +1,29 @@
-#ifndef __CEPH_DEDUPER_H__
-#define __CEPH_DEDUPER_H__
-
-//#include <rados/librados.hpp>
-#include "common/Mutex.h"
-#include "include/rados/librados.hpp"
-#include "osd/DedupOp.h"
-//#include "osd/OSD.h"
-#include "DedupLogger.h"
-#include "time_stats.h"
-#include <list>
-#include <map>
-#include <queue>
-#include <mutex>
+#ifndef DEDUPER_H
+#define DEDUPER_H
 
 #include "atomicops.h"
 #include "readerwriterqueue.h"
+#include "time_stats.h"
+
+#include "common/Mutex.h"
+#include "common/Clock.h"
+#include "include/rados/librados.hpp"
+
+#include "OpRequest.h"
+#include "PG.h"
+
 #include <chrono>
+#include <list>
+#include <map>
+#include <queue>
+//#include <mutex>
 
 #define PRINT_STATS 1
 
+
+class MOSDOp;
+class DedupOpBase;
+class Deduper;
 
 class Deduper
 {
@@ -45,7 +50,7 @@ public:
     void skip_write(std::string);
     bool check_skip_write(std::string);
 
-    bool filter_op(PGRef pg, OpRequestRef& op);
+    bool filter_op(spg_t pg, OpRequestRef& op);
     void cache_read(std::string, librados::bufferlist*);
     librados::bufferlist* get_cached_read(std::string);
 

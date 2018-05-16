@@ -1,10 +1,10 @@
-#include <chrono>
-#include <regex>
-#include <unistd.h>
-#include "common/Clock.h"
 #include "Deduper.h"
-#include "PG.h"
-#include "OSD.h"
+#include "DedupOp.h"
+#include "DedupLogger.h"
+
+#include "messages/MOSDOp.h"
+
+#include <regex>
 
 #define POST_PROCESS_TIME_MS 0
 #define SKIP_DEDUP_WRITE 0
@@ -110,7 +110,7 @@ void Deduper::flush_stats()
 #endif
 }
 
-bool Deduper::filter_op (PGRef pg, OpRequestRef& op)
+bool Deduper::filter_op (spg_t pg, OpRequestRef& op)
 {
     #if DISABLE_DEDUP
         //return 0;
@@ -119,7 +119,7 @@ bool Deduper::filter_op (PGRef pg, OpRequestRef& op)
     //Message* msg = op->get_req();
     //MOSDOp *m = static_cast<MOSDOp*>(op->get_req());
     const Message* msg = op->get_req();
-	MOSDOp *m = static_cast<MOSDOp*>(op->get_nonconst_req());
+    MOSDOp *m = static_cast<MOSDOp*>(op->get_nonconst_req());
 
     //not a regular op, return false
     if (m->get_type() != CEPH_MSG_OSD_OP)
@@ -143,7 +143,6 @@ bool Deduper::filter_op (PGRef pg, OpRequestRef& op)
     }
 
     #if PRINT_STATS
-        //utime_t elaps = ceph_clock_now(pg->get_cct());
         utime_t elaps = ceph_clock_now();
         elaps -= msg->get_recv_stamp();
         dlog("\n\n***** ELAPS: %.6f s\n", elaps.to_nsec()/1000000000.0);
@@ -237,7 +236,6 @@ librados::bufferlist* Deduper::get_cached_read (std::string name)
     }
 }
 
-
 //thread entry point
 void* Deduper::run(void* arg)
 {
@@ -301,3 +299,6 @@ void* Deduper::run(void* arg)
         //usleep(50);
     }
 }
+
+
+

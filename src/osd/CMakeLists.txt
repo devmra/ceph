@@ -32,9 +32,9 @@ set(osd_srcs
   mClockOpClassQueue.cc
   mClockClientQueue.cc
   PGQueueable.cc
-  Deduper.cc
   DedupLogger.cc
   DedupOp.cc
+  Deduper.cc
   time_stats.c
   ${CMAKE_SOURCE_DIR}/src/common/TrackedOp.cc
   ${osd_cyg_functions_src}
@@ -47,7 +47,7 @@ add_library(osd STATIC ${osd_srcs}
   $<TARGET_OBJECTS:cls_references_objs>
   $<TARGET_OBJECTS:global_common_objs>
   $<TARGET_OBJECTS:heap_profiler_objs>)
-target_link_libraries(osd ${LEVELDB_LIBRARIES} dmclock ${CMAKE_DL_LIBS} ${ALLOC_LIBS})
+target_link_libraries(osd ${LEVELDB_LIBRARIES} dmclock ${CMAKE_DL_LIBS} ${ALLOC_LIBS} librados)
 if(WITH_LTTNG)
   add_dependencies(osd osd-tp pg-tp)
 endif()

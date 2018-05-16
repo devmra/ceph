@@ -1,10 +1,6 @@
-#include "osd/DedupOp.h"
-#include "boost/algorithm/string.hpp"
-#include <algorithm>
-#include "osd/Deduper.h"
-#include <chrono>
-#include "include/rados/librados.hpp"
+#include "Deduper.h"
 #include "DedupLogger.h"
+#include "DedupOp.h"
 
 /************************
  * 
@@ -201,7 +197,7 @@ void DedupRadosOps::concatenate_bufs(librados::bufferlist* bl)
  * 
  ***********************/
 
-DedupOpBase::DedupOpBase (PGRef& pg, OpRequestRef& op, uint32_t time)
+DedupOpBase::DedupOpBase (spg_t& pg, OpRequestRef& op, uint32_t time)
 {
     this->op = op;
     this->pg = pg;

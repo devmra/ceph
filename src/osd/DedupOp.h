@@ -1,17 +1,21 @@
-#ifndef __DEDUP_OP_H__
-#define __DEDUP_OP_H__
+#ifndef DEDUPOP_H
+#define DEDUPOP_H
 
-#include <list>
+#include "boost/algorithm/string.hpp"
+#include "include/rados/librados.hpp"
+#include "include/types.h"
+#include "osd_types.h"
+
+#include "OpRequest.h"
+#include "PG.h"
+
+#include <algorithm>
 #include <chrono>
+#include <list>
 #include <ctime>
 #include <map>
-#include "include/rados/librados.hpp"
-#include "osd/OpRequest.h"
-#include "osd/osd_types.h"
-//#include "types.h"
-#include "PG.h"
-//hash
 
+//hash
 void MurmurHash3_x86_32 (const void * key, int len,
     uint32_t seed, void * out);
 void MurmurHash3_x86_128 (const void * key, const int len,
@@ -50,7 +54,7 @@ class DedupOpBase
 {
 public:
     OpRequestRef op;
-    PGRef pg;
+    spg_t pg;
 
     enum State { START, READING, WRITING, DONE, READING_RECIPE, 
         WRITING_RECIPE, SLEEPING, SLEEP, 
@@ -66,7 +70,7 @@ public:
     
 
 public:
-    DedupOpBase(PGRef&, OpRequestRef&, uint32_t);
+    DedupOpBase(spg_t&, OpRequestRef&, uint32_t);
     virtual ~DedupOpBase();
     bool is_ready();
     void set_data(std::string, uint32_t, librados::Rados*);
@@ -81,7 +85,7 @@ public:
 class DedupOpInlineWrite : public DedupOpBase 
 {
 public:
-    DedupOpInlineWrite(PGRef pg, OpRequestRef& op, uint32_t time)
+    DedupOpInlineWrite(spg_t pg, OpRequestRef& op, uint32_t time)
         : DedupOpBase (pg, op,time)
     {
     }
@@ -94,7 +98,7 @@ public:
 
 class DedupOpPostProcessWrite : public DedupOpBase {
 public:
-    DedupOpPostProcessWrite(PGRef pg, OpRequestRef& op, uint32_t time)
+    DedupOpPostProcessWrite(spg_t pg, OpRequestRef& op, uint32_t time)
         : DedupOpBase (pg, op, time)
     {
     }
@@ -107,7 +111,7 @@ public:
 
 class DedupOpRead : public DedupOpBase {
 public:
-    DedupOpRead(PGRef pg, OpRequestRef& op)
+    DedupOpRead(spg_t pg, OpRequestRef& op)
         : DedupOpBase (pg, op, 0)
     {
     }
@@ -117,6 +121,5 @@ public:
     void queue_back();
     bool is_write() { return false; }
 };
-
 
 #endif

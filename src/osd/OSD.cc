@@ -30,6 +30,15 @@
 #include <sys/mount.h>
 #endif
 
+// mra: dedup code
+#define SEPD 
+
+#ifdef SEPD
+#include "osd/Deduper.h"
+#include <pthread.h>
+#endif 
+// mra: dedup code
+
 #include "osd/PG.h"
 
 #include "include/types.h"
@@ -2029,6 +2038,13 @@ OSD::OSD(CephContext *cct_, ObjectStore *store_,
                                            cct->_conf->osd_op_history_duration);
   op_tracker.set_history_slow_op_size_and_threshold(cct->_conf->osd_op_history_slow_op_size,
                                                     cct->_conf->osd_op_history_slow_op_threshold);
+
+#ifdef SEPD
+  // mra: dedup code
+  pthread_t deduper_thread;
+  pthread_create(&deduper_thread, NULL, &Deduper::run, NULL);
+#endif
+
 #ifdef WITH_BLKIN
   std::stringstream ss;
   ss << "osd." << whoami;
@@ -9742,6 +9758,12 @@ bool OSD::op_is_discardable(const MOSDOp *op)
 
 void OSD::enqueue_op(spg_t pg, OpRequestRef& op, epoch_t epoch)
 {
+#ifdef SEPD
+  // mra: dedup code
+  if (Deduper::get_instance().filter_op(pg, op) == true)
+    return;
+#endif
+
   utime_t latency = ceph_clock_now() - op->get_req()->get_recv_stamp();
   dout(15) << "enqueue_op " << op << " prio " << op->get_req()->get_priority()
 	   << " cost " << op->get_req()->get_cost()
